@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using System.IO;
 
-namespace WebApplication1
+namespace Lunch.Host
 {
     public class Program
     {
