@@ -5,11 +5,13 @@ VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunch.Host", "Projects\Lunch.Host\Lunch.Host.csproj", "{64EB18F4-367E-4829-B319-F1F07032FEA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunch.Handlers", "Projects\Lunch.Handlers\Lunch.Handlers.csproj", "{67D10D66-1AF7-4C0C-8D28-6D68F2834DF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunch.Services", "Projects\Lunch.Handlers\Lunch.Services.csproj", "{67D10D66-1AF7-4C0C-8D28-6D68F2834DF8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunch.Sheets.Client", "Projects\Lunch.Sheets.Client\Lunch.Sheets.Client.csproj", "{4C84E940-D0D1-4EB4-A933-DBF53B69FBB3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunch.Domain", "Projects\Lunch.Domain\Lunch.Domain.csproj", "{9A709915-4FAE-4871-ADE8-EB175790E577}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunch.Authorization", "Projects\Lunch.Authorization\Lunch.Authorization.csproj", "{C9112DD0-8F2D-4211-9E30-77545F6D059F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9A709915-4FAE-4871-ADE8-EB175790E577}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A709915-4FAE-4871-ADE8-EB175790E577}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A709915-4FAE-4871-ADE8-EB175790E577}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9112DD0-8F2D-4211-9E30-77545F6D059F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9112DD0-8F2D-4211-9E30-77545F6D059F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9112DD0-8F2D-4211-9E30-77545F6D059F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9112DD0-8F2D-4211-9E30-77545F6D059F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

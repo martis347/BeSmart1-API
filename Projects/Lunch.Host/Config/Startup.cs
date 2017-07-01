@@ -1,10 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Lunch.Authorization;
+using Lunch.Domain.Config;
+using Lunch.Host.Filters;
+using Lunch.Services.Providers;
+using Lunch.Sheets.Client;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using IAuthorizationService = Lunch.Authorization.IAuthorizationService;
 
-namespace Lunch.Host
+namespace Lunch.Host.Config
 {
     public class Startup
     {
@@ -24,8 +31,23 @@ namespace Lunch.Host
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(options =>
+                {
+                    options.Filters.Add(typeof(AuthorizationFilter));
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
             services.AddCors();
+
+            services.Configure<GoogleConfig>(Configuration.GetSection("Google"));
+            services.Configure<ProviderConfig>(Configuration.GetSection("Provider"));
+            
+            services.AddSingleton<ISheetsClient, GoogleSheetsClient>();
+            services.AddTransient<IProvidersService, ProvidersService>();
+            
+            services.AddScoped<IAuthorizationService, AuthorizationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
