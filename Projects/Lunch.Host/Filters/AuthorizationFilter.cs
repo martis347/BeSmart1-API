@@ -20,7 +20,7 @@ namespace Lunch.Host.Filters
             var success = _authorizationService.Authorize(token);
             if (!success)
             {
-                throw new AuthenticationException();
+                throw new AuthenticationException("Provided access token is not valid.");
             }
         }
 

@@ -34,6 +34,7 @@ namespace Lunch.Host.Config
             services.AddMvc(options =>
                 {
                     options.Filters.Add(typeof(AuthorizationFilter));
+                    options.Filters.Add(typeof(ExceptionFilter));
                 })
                 .AddJsonOptions(options =>
                 {
