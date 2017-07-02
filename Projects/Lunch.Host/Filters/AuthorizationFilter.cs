@@ -17,7 +17,7 @@ namespace Lunch.Host.Filters
         {
             var token = context.HttpContext.Request.Headers["access_token"];
 
-            var success = _authorizationService.Authorize(token);
+            var success = _authorizationService.Authorize(token);   
             if (!success)
             {
                 throw new AuthenticationException("Provided access token is not valid.");

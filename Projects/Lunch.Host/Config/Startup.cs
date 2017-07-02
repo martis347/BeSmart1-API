@@ -5,6 +5,7 @@ using Lunch.Services.Providers;
 using Lunch.Sheets.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -30,17 +31,21 @@ namespace Lunch.Host.Config
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options
+                .AddPolicy("AllowAllOrigins", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader()));
+            
             // Add framework services.
             services.AddMvc(options =>
                 {
                     options.Filters.Add(typeof(AuthorizationFilter));
                     options.Filters.Add(typeof(ExceptionFilter));
+                    options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigins"));
                 })
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
-            services.AddCors();
+            
 
             services.Configure<GoogleConfig>(Configuration.GetSection("Google"));
             services.Configure<ProviderConfig>(Configuration.GetSection("Provider"));
@@ -59,9 +64,12 @@ namespace Lunch.Host.Config
 
             app.UseMvc();
 
-            app.UseCors(builder =>
-                builder.AllowAnyHeader()
-            );
+            /*app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowCredentials()
+            );*/
 
         }
     }
