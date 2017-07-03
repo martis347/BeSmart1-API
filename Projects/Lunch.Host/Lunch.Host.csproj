@@ -27,9 +27,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Lunch.Domain\Lunch.Domain.csproj" />
     <ProjectReference Include="..\Lunch.Authorization\Lunch.Authorization.csproj" />
-    <ProjectReference Include="..\Lunch.Domain2\Lunch.Domain.csproj" />
     <ProjectReference Include="..\Lunch.Domain\Lunch.Domain.csproj" />
     <ProjectReference Include="..\Lunch.Handlers\Lunch.Services.csproj" />
     <ProjectReference Include="..\Lunch.Sheets.Client\Lunch.Sheets.Client.csproj" />
