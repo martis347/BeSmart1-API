@@ -20,7 +20,6 @@ namespace Lunch.Host.Controllers
         {
             var accessToken = Request.Headers["access_token"];
             
-            _client.GetSheetData("", "", "");
             return new List<Person>
             {
                 new Person("Greg M."),

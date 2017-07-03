@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lunch.Host.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/")]
     public class ProvidersController: Controller
     {
         private readonly IProvidersService _providers;
@@ -16,14 +16,14 @@ namespace Lunch.Host.Controllers
             _providers = providers;
         }
         
-        [HttpGet]
-        public async Task<IList<Provider>> Get()
+        [HttpGet("{dayOfWeek}")]
+        public async Task<IList<Provider>> Get(string dayOfWeek)
         {
             IList<Provider> result;
             
             try
             {
-                result = await _providers.GetProviders(DateTime.MaxValue).ConfigureAwait(false);
+                result = await _providers.GetProviders(dayOfWeek).ConfigureAwait(false);
             }
             catch (Exception e)
             {

@@ -7,6 +7,6 @@ namespace Lunch.Services.Providers
 {
     public interface IProvidersService
     {
-        Task<IList<Provider>> GetProviders(DateTime time);
+        Task<IList<Provider>> GetProviders(string dayOfWeek);
     }
 }
