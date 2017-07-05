@@ -1,7 +1,6 @@
 ﻿using Lunch.Domain;
 using Lunch.Services.Providers;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,18 +18,8 @@ namespace Lunch.Host.Controllers
         [HttpGet("{dayOfWeek}")]
         public async Task<IList<Provider>> Get(string dayOfWeek)
         {
-            IList<Provider> result;
-            
-            try
-            {
-                result = await _providers.GetProviders(dayOfWeek).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            
+            var result = await _providers.GetProviders(dayOfWeek).ConfigureAwait(false);
+
             return result;
         }
     }

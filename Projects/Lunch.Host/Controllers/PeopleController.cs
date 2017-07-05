@@ -1,31 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using Lunch.Domain;
-using Lunch.Sheets.Client;
+﻿using Lunch.Domain;
+using Lunch.Services.People;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lunch.Host.Controllers
 {
     [Route("api/[controller]")]
     public class PeopleController : Controller
     {
-        private readonly ISheetsClient _client;
-        public PeopleController(ISheetsClient client)
+        private readonly IPeopleService _peopleService;
+        public PeopleController(IPeopleService peopleService)
         {
-            _client = client;
+            _peopleService = peopleService;
         }
 
         [HttpGet]
-        public IList<Person> Get()
+        public async Task<IList<Person>> Get()
         {
-            var accessToken = Request.Headers["access_token"];
-            
-            return new List<Person>
-            {
-                new Person("Greg M."),
-                new Person("Betty P."),
-                new Person("Johnny T."),
-            };
+            var result = await _peopleService.GetPeople().ConfigureAwait(false);
+
+            return result;
         }
     }
 }
