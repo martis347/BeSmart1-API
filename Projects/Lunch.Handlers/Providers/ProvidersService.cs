@@ -121,7 +121,8 @@ namespace Lunch.Services.Providers
                         providers.Add(providerList);
                         providerList = new Provider();
                     }
-                    providerList.Name = row[0];
+                    providerList.Description = sheetsResponse.Rows[0][0].Replace("Supplier-", "");
+                    providerList.Name = UpperCaseToPascalCase(row[0]);
                     firstProvider = false;
                     continue;
                 }
@@ -133,6 +134,18 @@ namespace Lunch.Services.Providers
             
             providers.Add(providerList);
             return providers;
+        }
+
+        private string UpperCaseToPascalCase(string uppercase)
+        {
+            var words = uppercase.Split(' ');
+            string result = "";
+            foreach (var word in words)
+            {
+                result += word[0] + word.Substring(1).ToLowerInvariant() + " ";
+            }
+
+            return result.Trim();
         }
 
         private Dish MapDish(string value, string price, string category)
