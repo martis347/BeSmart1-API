@@ -87,7 +87,7 @@ namespace Lunch.Services.Providers
                 }
                 if (!String.IsNullOrEmpty(row[1]))
                 {
-                    providerList.Dishes.Add(MapDish(row[0], row[1], currentCategory.Trim(':')));
+                    providerList.Dishes.Add(MapDish(row[0], row[1], currentCategory.Trim(':'), providerList.Name));
                 }
             }
             providers.Add(providerList);
@@ -103,7 +103,7 @@ namespace Lunch.Services.Providers
             bool firstProvider = true;
             foreach (var row in sheetsResponse.Rows)
             {
-                if (_providerConfig.FridayProviders.ContainsValue(row[0]))
+                if (_providerConfig.FridayProviders.ContainsKey(row[0]))
                 {
                     if (!firstProvider)
                     {
@@ -117,7 +117,7 @@ namespace Lunch.Services.Providers
                 }
                 if (!String.IsNullOrEmpty(row[1]))
                 {
-                    providerList.Dishes.Add(MapFridayDish(row[0], row[1], _providerConfig.FridayProviders.ContainsKey(providerList.Name)));
+                    providerList.Dishes.Add(MapFridayDish(row[0], row[1], _providerConfig.FridayProviders.ContainsKey(providerList.Name), providerList.Name));
                 }
             }
             
@@ -137,7 +137,7 @@ namespace Lunch.Services.Providers
             return result.Trim();
         }
 
-        private Dish MapDish(string value, string price, string category)
+        private Dish MapDish(string value, string price, string category, string providerName)
         {
             double priceValue = Double.Parse(price.Trim('€').Replace(',', '.'));
 
@@ -160,6 +160,7 @@ namespace Lunch.Services.Providers
                 {
                     DishType = DishType.Combined,
                     Name = value.Trim(),
+                    ProviderName = providerName,
                     Price = priceValue,
                     Category = category,
                     MainDishes = new List<string> { mainDish.Trim() },
@@ -172,6 +173,7 @@ namespace Lunch.Services.Providers
                 {
                     DishType = DishType.Side,
                     Name = value.Trim(),
+                    ProviderName = providerName,
                     Price = priceValue,
                     Category = category
                 };
@@ -182,6 +184,7 @@ namespace Lunch.Services.Providers
                 {
                     DishType = DishType.Main,
                     Name = value.Trim(),
+                    ProviderName = providerName,
                     Price = priceValue,
                     Category = category
                 };
@@ -190,12 +193,13 @@ namespace Lunch.Services.Providers
             return result;
         }
 
-        private Dish MapFridayDish(string name, string count, bool isSoup)
+        private Dish MapFridayDish(string name, string count, bool isSoup, string providerName)
         {
             var result = new Dish
             {
                 DishType = isSoup ? DishType.Side : DishType.Main,
                 Name = name.Trim(),
+                ProviderName = providerName,
                 Count = Int32.Parse(count.Trim())
             };
 

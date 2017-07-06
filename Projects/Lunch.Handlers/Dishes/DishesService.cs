@@ -43,9 +43,10 @@ namespace Lunch.Services.Dishes
                 destinationFromColumn = _dishesConfig.FromColumnLetter,
                 destinationToColumn = _dishesConfig.ToColumnLetter;
 
-            List<List<string>> request = new List<List<string>> {new List<string> {selection.SideDish.Name, selection.MainDish.Name}};
+            List<List<string>> request = new List<List<string>> {new List<string> { selection.SideDish != null ? selection.SideDish.Name : "", selection.MainDish != null ? selection.MainDish.Name : "" } };
             var providers = _providerConfig.Providers;
-
+            bool addCurrencyFormatting = true;
+            
             if (day == DayOfWeek.Friday)
             {
                 sheetId = _googleConfig.FridaySheetId;
@@ -54,10 +55,11 @@ namespace Lunch.Services.Dishes
                 destinationFromColumn = _dishesConfig.FromColumnFridayLetter;
                 destinationToColumn = _dishesConfig.ToColumnFridayLetter;
                 providers = _providerConfig.FridayProviders;
+                addCurrencyFormatting = false;
             }
             else
             {
-                request[0].Add(selection.Price);
+                request[0].Add(selection.Price.Replace('.', ','));
             }
 
             var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
@@ -74,15 +76,18 @@ namespace Lunch.Services.Dishes
             destinationToColumn = destinationToColumn + rowNumber;
 
             var stylesheetRequest = BuildSheetStyleRequest(selection, providers, sheets[0].SheetId,
-                rowNumber - 1, char.ToUpper(fromColumn[0]) - 64, rowNumber - 1, char.ToUpper(fromColumn[0]) - 64 + 1);
+                rowNumber - 1, char.ToUpper(fromColumn[0]) - 64, addCurrencyFormatting);
 
             await _sheetsClient.UpdateSheetStyling(sheetId, stylesheetRequest);
 
             await _sheetsClient.UpdateSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[0].Title, request).ConfigureAwait(false);
         }
 
-        private SheetStyleRequest BuildSheetStyleRequest(UserSelection selection, Dictionary<string, string> providers, string sheetId, int sideDishX, int sideDishY, int mainDishX, int mainDishY)
+        private SheetStyleRequest BuildSheetStyleRequest(UserSelection selection, Dictionary<string, string> providers, string sheetId, int sideDishX, int sideDishY, bool addCurrencyFormatting)
         {
+            var font = selection.SideDish != null && String.IsNullOrEmpty(selection.SideDish.Provider) ? "Arial" : "Times New Roman";
+
+
             var request = new SheetStyleRequest
             {
                 Requests = new List<StyleSheetPartRequest>
@@ -106,12 +111,12 @@ namespace Lunch.Services.Dishes
                                 {
                                     TextFormat = new TextFormat
                                     {
-                                        FontFamily = String.IsNullOrEmpty(selection.SideDish.Provider) ? "Times New Roman" : "Arial",
+                                        FontFamily = font,
                                         FontSize = "12",
                                         ForegroundColor = new ForegroundColor
                                         {
-                                            Green = providers.ContainsKey(selection.SideDish.Provider) && providers[selection.SideDish.Provider] == "green" ? "120" : "0",
-                                            Red = providers.ContainsKey(selection.SideDish.Provider) && providers[selection.SideDish.Provider] == "red" ? "120" : "0"
+                                            Green = selection.SideDish != null && providers.ContainsKey(selection.SideDish.Provider) && providers[selection.SideDish.Provider] == "green" ? "120" : "0",
+                                            Red = selection.SideDish != null && providers.ContainsKey(selection.SideDish.Provider) && providers[selection.SideDish.Provider] == "red" ? "120" : "0"
                                         }
                                     }
                                 }
@@ -126,10 +131,10 @@ namespace Lunch.Services.Dishes
                             Range = new Range
                             {
                                 SheetId = sheetId,
-                                StartColumnIndex = mainDishY,
-                                EndColumnIndex = mainDishY + 1,
-                                StartRowIndex = mainDishX,
-                                EndRowIndex = mainDishX + 1
+                                StartColumnIndex = sideDishY + 1,
+                                EndColumnIndex = sideDishY + 2,
+                                StartRowIndex = sideDishX,
+                                EndRowIndex = sideDishX + 1
                             },
                             Cell = new Cell
                             {
@@ -137,12 +142,12 @@ namespace Lunch.Services.Dishes
                                 {
                                     TextFormat = new TextFormat
                                     {
-                                        FontFamily = String.IsNullOrEmpty(selection.SideDish.Provider) ? "Times New Roman" : "Arial",
+                                        FontFamily = font,
                                         FontSize = "12",
                                         ForegroundColor = new ForegroundColor
                                         {
-                                            Green = providers.ContainsKey(selection.MainDish.Provider) && providers[selection.MainDish.Provider] == "green" ? "120" : "0",
-                                            Red = providers.ContainsKey(selection.MainDish.Provider) && providers[selection.MainDish.Provider] == "red" ? "120" : "0"
+                                            Green = selection.MainDish != null &&providers.ContainsKey(selection.MainDish.Provider) && providers[selection.MainDish.Provider] == "green" ? "120" : "0",
+                                            Red = selection.MainDish != null &&providers.ContainsKey(selection.MainDish.Provider) && providers[selection.MainDish.Provider] == "red" ? "120" : "0"
                                         }
                                     }
                                 }
@@ -151,6 +156,41 @@ namespace Lunch.Services.Dishes
                     }
                 }
             };
+
+            if (addCurrencyFormatting)
+            {
+                request.Requests.Add(new StyleSheetPartRequest
+                {
+                    RepeatCell = new RepeatCell
+                    {
+                        Fields = "*",
+                        Range = new Range
+                        {
+                            SheetId = sheetId,
+                            StartColumnIndex = sideDishY + 2,
+                            EndColumnIndex = sideDishY + 3,
+                            StartRowIndex = sideDishX,
+                            EndRowIndex = sideDishX + 1
+                        },
+                        Cell = new Cell
+                        {
+                            UserEnteredFormat = new UserEnteredFormat
+                            {
+                                TextFormat = new TextFormat
+                                {
+                                    FontFamily = font,
+                                    FontSize = "12"
+                                },
+                                NumberFormat = new NumberFormat
+                                {
+                                    Type = "CURRENCY",
+                                    Pattern = "€0.00"
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
             return request;
         }

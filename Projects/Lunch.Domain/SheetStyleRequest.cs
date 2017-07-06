@@ -36,6 +36,7 @@ namespace Lunch.Domain
     public class UserEnteredFormat
     {
         public TextFormat TextFormat { get; set; }
+        public NumberFormat NumberFormat { get; set; }
     }
 
     public class TextFormat
@@ -43,6 +44,12 @@ namespace Lunch.Domain
         public string FontFamily { get; set; }
         public string FontSize { get; set; }
         public ForegroundColor ForegroundColor { get; set; }
+    }
+
+    public class NumberFormat
+    {
+        public string Type { get; set; }
+        public string Pattern { get; set; }
     }
 
     public class ForegroundColor
