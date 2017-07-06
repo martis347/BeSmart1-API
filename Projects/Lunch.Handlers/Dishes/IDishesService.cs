@@ -5,6 +5,6 @@ namespace Lunch.Services.Dishes
 {
     public interface IDishesService
     {
-        Task SelectDishes(UserSelection selection);
+        Task SelectDishes(UserSelection selection, string dayOfWeek);
     }
 }

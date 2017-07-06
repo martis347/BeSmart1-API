@@ -29,9 +29,9 @@ namespace Lunch.Services.People
         {
             _sheetsClient.SetAuthorization(_authService.GetToken());
 
-            var sheets = await _sheetsClient.GetSheetNames(_googleConfig.FridaySheetId).ConfigureAwait(false);
+            var sheets = await _sheetsClient.GetSheetsInfo(_googleConfig.FridaySheetId).ConfigureAwait(false);
             var sheetsRespone = await _sheetsClient
-                .GetSheetData(_peopleConfig.FromColumn, _peopleConfig.ToColumn, _googleConfig.FridaySheetId, sheets[0])
+                .GetSheetData(_peopleConfig.FromColumnFriday, _peopleConfig.ToColumnFriday, _googleConfig.FridaySheetId, sheets[0].Title)
                 .ConfigureAwait(false);
 
             var result = sheetsRespone.Rows

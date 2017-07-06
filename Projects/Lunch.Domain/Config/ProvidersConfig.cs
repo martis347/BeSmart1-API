@@ -12,7 +12,7 @@ namespace Lunch.Domain.Config
 
         public string ToColumnFriday { get; set; }
         
-        public List<string> ProvidersNames { get; set; }
-        public List<string> FridayProvidersNames { get; set; }
+        public Dictionary<string, string> Providers { get; set; }
+        public Dictionary<string, string> FridayProviders { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Lunch.Authorization;
 using Lunch.Domain.Config;
 using Lunch.Host.Filters;
+using Lunch.Services.Dishes;
 using Lunch.Services.People;
 using Lunch.Services.Providers;
 using Lunch.Sheets.Client;
@@ -51,10 +52,12 @@ namespace Lunch.Host.Config
             services.Configure<GoogleConfig>(Configuration.GetSection("Google"));
             services.Configure<ProviderConfig>(Configuration.GetSection("Provider"));
             services.Configure<PeopleConfig>(Configuration.GetSection("People"));
+            services.Configure<DishesConfig>(Configuration.GetSection("Dishes"));
             
             services.AddSingleton<ISheetsClient, GoogleSheetsClient>();
             services.AddTransient<IProvidersService, ProvidersService>();
             services.AddTransient<IPeopleService, PeopleService>();
+            services.AddTransient<IDishesService, DishesService>();
             
             services.AddScoped<IAuthorizationService, AuthorizationService>();
         }

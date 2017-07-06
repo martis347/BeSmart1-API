@@ -2,8 +2,16 @@
 {
     public class UserSelection
     {
-        public double Price { get; set; }
-        public Dish MainDish { get; set; }
-        public Dish SideDish { get; set; }
+        public string Price { get; set; }
+        public DishSelection MainDish { get; set; }
+        public DishSelection SideDish { get; set; }
+        public string UserName { get; set; }
+    }
+
+    public class DishSelection
+    {
+        public string Name { get; set; }
+        public string Provider { get; set; }
+
     }
 }

@@ -30,13 +30,13 @@ namespace Lunch.Services.Providers
         public async Task<IList<Provider>> GetProviders(string dayOfWeek)
         {
             _sheetsClient.SetAuthorization(_authService.GetToken());
-            var day = GetDayOfWeek(dayOfWeek);
+            var day = ServicesHelper.GetDayOfWeek(dayOfWeek);
             List<Provider> providers;
             
             if (day == DayOfWeek.Friday)
             {
-                var sheets = await _sheetsClient.GetSheetNames(_googleConfig.FridaySheetId);
-                var sheetName = sheets[0];
+                var sheets = await _sheetsClient.GetSheetsInfo(_googleConfig.FridaySheetId);
+                var sheetName = sheets[0].Title;
                 var response = await _sheetsClient.GetSheetData(_providerConfig.FromColumnFriday, _providerConfig.ToColumnFriday, _googleConfig.FridaySheetId, sheetName)
                     .ConfigureAwait(false);
 
@@ -44,12 +44,12 @@ namespace Lunch.Services.Providers
             }
             else
             {
-                var sheets = await _sheetsClient.GetSheetNames(_googleConfig.SheetId);
+                var sheets = await _sheetsClient.GetSheetsInfo(_googleConfig.SheetId);
                 if (sheets.Count < 4)
                 {
                     throw new ApiException("Too few sheets on document. Please check that.", 403);
                 }
-                var sheetName = sheets[day == DayOfWeek.Friday ? 0 : (int)day];
+                var sheetName = sheets[day == DayOfWeek.Friday ? 0 : (int)day].Title;
                 var response = await _sheetsClient.GetSheetData(_providerConfig.FromColumn, _providerConfig.ToColumn, _googleConfig.SheetId, sheetName)
                     .ConfigureAwait(false);
 
@@ -57,17 +57,6 @@ namespace Lunch.Services.Providers
             }
 
             return providers;
-        }
-
-        private DayOfWeek GetDayOfWeek(string dayOfWeek)
-        {
-            DayOfWeek result;
-            if (!Enum.TryParse(dayOfWeek, true, out result))
-            {
-                throw new ApiException("Incorrect day of week provided", 400);
-            }
-
-            return result;
         }
 
         private List<Provider> MapProviders(SheetsResponse sheetsResponse)
@@ -85,7 +74,7 @@ namespace Lunch.Services.Providers
                     currentCategory = row[0];
                     continue;
                 }
-                if (_providerConfig.ProvidersNames.Contains(row[0]))
+                if (_providerConfig.Providers.ContainsKey(row[0]))
                 {
                     if (!firstProvider)
                     {
@@ -114,7 +103,7 @@ namespace Lunch.Services.Providers
             bool firstProvider = true;
             foreach (var row in sheetsResponse.Rows)
             {
-                if (_providerConfig.FridayProvidersNames.Contains(row[0]))
+                if (_providerConfig.FridayProviders.ContainsValue(row[0]))
                 {
                     if (!firstProvider)
                     {
@@ -128,7 +117,7 @@ namespace Lunch.Services.Providers
                 }
                 if (!String.IsNullOrEmpty(row[1]))
                 {
-                    providerList.Dishes.Add(MapFridayDish(row[0], row[1], providerList.Name == _providerConfig.FridayProvidersNames[0]));
+                    providerList.Dishes.Add(MapFridayDish(row[0], row[1], _providerConfig.FridayProviders.ContainsKey(providerList.Name)));
                 }
             }
             
