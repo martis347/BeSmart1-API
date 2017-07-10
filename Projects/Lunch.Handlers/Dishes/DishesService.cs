@@ -59,7 +59,10 @@ namespace Lunch.Services.Dishes
             }
             else
             {
-                request[0].Add(selection.Price.Replace('.', ','));
+                if (!String.IsNullOrEmpty(selection.Price) && selection.Price != "0")
+                {
+                    request[0].Add(selection.Price.Replace('.', ','));
+                }
             }
 
             var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
@@ -81,6 +84,52 @@ namespace Lunch.Services.Dishes
             await _sheetsClient.UpdateSheetStyling(sheetId, stylesheetRequest);
 
             await _sheetsClient.UpdateSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[0].Title, request).ConfigureAwait(false);
+        }
+
+        public async Task<SelectedDishesResponse> GetSelectedDishes(string dayOfWeek, string username)
+        {
+            _sheetsClient.SetAuthorization(_authService.GetToken());
+
+            var day = ServicesHelper.GetDayOfWeek(dayOfWeek);
+
+            string sheetId = _googleConfig.SheetId,
+                fromColumn = _peopleConfig.FromColumn,
+                toColumn = _peopleConfig.ToColumn,
+                destinationFromColumn = _dishesConfig.FromColumnLetter,
+                destinationToColumn = _dishesConfig.ToColumnLetter;
+
+            if (day == DayOfWeek.Friday)
+            {
+                sheetId = _googleConfig.FridaySheetId;
+                fromColumn = _peopleConfig.FromColumnFriday;
+                toColumn = _peopleConfig.ToColumnFriday;
+                destinationFromColumn = _dishesConfig.FromColumnFridayLetter;
+                destinationToColumn = _dishesConfig.ToColumnFridayLetter;
+            }
+
+            var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
+            var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[0].Title)
+                .ConfigureAwait(false);
+
+            var rowNumber = response.Rows.Select(r => r[0].ToLowerInvariant()).ToList().IndexOf(username.ToLowerInvariant());
+            if (rowNumber++ == -1)
+            {
+                throw new ApiException("User with given name not found in sheet", 400);
+            }
+
+            destinationFromColumn = destinationFromColumn + rowNumber;
+            destinationToColumn = destinationToColumn + rowNumber;
+
+            var clientResult = await _sheetsClient.GetSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[0].Title);
+
+            var result = new SelectedDishesResponse
+            {
+                MainDish = clientResult.Rows[0][1].Length > 4 ? clientResult.Rows[0][1] : null,
+                SideDish = clientResult.Rows[0][0].Length > 4 ? clientResult.Rows[0][0] : null,
+                Price = clientResult.Rows[0].Count > 2 && clientResult.Rows[0][2].Contains('€') ? clientResult.Rows[0][2] : null
+            };
+
+            return result;
         }
 
         private SheetStyleRequest BuildSheetStyleRequest(UserSelection selection, Dictionary<string, string> providers, string sheetId, int sideDishX, int sideDishY, bool addCurrencyFormatting)

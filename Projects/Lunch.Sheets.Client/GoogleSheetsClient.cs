@@ -101,6 +101,20 @@ namespace Lunch.Sheets.Client
         {
             var jObject = Newtonsoft.Json.Linq.JObject.Parse(await content.ReadAsStringAsync().ConfigureAwait(false));
             SheetsResponse result = new SheetsResponse();
+            if (jObject.GetValue("values") == null)
+            {
+                return new SheetsResponse
+                {
+                    Rows = new List<List<string>>
+                    {
+                        new List<string>
+                        {
+                            "", "", ""
+                        }
+                    }
+                };
+            }
+            
             foreach (var row in jObject["values"])
             {
                 List<string> rowValues = new List<string>();

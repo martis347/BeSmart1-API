@@ -87,7 +87,7 @@ namespace Lunch.Services.Providers
                 }
                 if (!String.IsNullOrEmpty(row[1]))
                 {
-                    providerList.Dishes.Add(MapDish(row[0], row[1], currentCategory.Trim(':'), providerList.Name));
+                    providerList.Dishes.Add(ServicesHelper.MapDish(row[0], row[1], currentCategory.Trim(':'), providerList.Name));
                 }
             }
             providers.Add(providerList);
@@ -117,7 +117,8 @@ namespace Lunch.Services.Providers
                 }
                 if (!String.IsNullOrEmpty(row[1]))
                 {
-                    providerList.Dishes.Add(MapFridayDish(row[0], row[1], _providerConfig.FridayProviders.ContainsKey(providerList.Name), providerList.Name));
+                    var isSoup = _providerConfig.FridayProviders.Select(p => p.Key.ToLowerInvariant()).ToList().IndexOf(providerList.Name.ToLowerInvariant()) == 1;
+                    providerList.Dishes.Add(ServicesHelper.MapFridayDish(row[0], row[1], isSoup, providerList.Name));
                 }
             }
             
@@ -135,75 +136,6 @@ namespace Lunch.Services.Providers
             }
 
             return result.Trim();
-        }
-
-        private Dish MapDish(string value, string price, string category, string providerName)
-        {
-            double priceValue = Double.Parse(price.Trim('€').Replace(',', '.'));
-
-            Dish result;
-            string[] splitValue = value.Split('+');
-            if (splitValue.Length > 1)
-            {
-                string mainDish = splitValue[0];
-                List<string> sideDishes = new List<string>();
-                if (splitValue.Length > 1)
-                {
-                    string[] splitSideDishValue = splitValue[1].Split(new[] { "ARBA" }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var dish in splitSideDishValue)
-                    {
-                        sideDishes.Add(dish.Trim());
-                    }
-                }
-
-                result = new Dish
-                {
-                    DishType = DishType.Combined,
-                    Name = value.Trim(),
-                    ProviderName = providerName,
-                    Price = priceValue,
-                    Category = category,
-                    MainDishes = new List<string> { mainDish.Trim() },
-                    SideDishes = sideDishes
-                };
-            }
-            else if (priceValue < 2)
-            {
-                result = new Dish
-                {
-                    DishType = DishType.Side,
-                    Name = value.Trim(),
-                    ProviderName = providerName,
-                    Price = priceValue,
-                    Category = category
-                };
-            }
-            else
-            {
-                result = new Dish
-                {
-                    DishType = DishType.Main,
-                    Name = value.Trim(),
-                    ProviderName = providerName,
-                    Price = priceValue,
-                    Category = category
-                };
-            }
-            
-            return result;
-        }
-
-        private Dish MapFridayDish(string name, string count, bool isSoup, string providerName)
-        {
-            var result = new Dish
-            {
-                DishType = isSoup ? DishType.Side : DishType.Main,
-                Name = name.Trim(),
-                ProviderName = providerName,
-                Count = Int32.Parse(count.Trim())
-            };
-
-            return result;
         }
     }
 }
