@@ -66,7 +66,9 @@ namespace Lunch.Services.Dishes
             }
 
             var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
-            var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[0].Title)
+            int sheetIndex = day == DayOfWeek.Friday ? 0 : (int)day;
+
+            var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[sheetIndex].Title)
                 .ConfigureAwait(false);
 
             var rowNumber = response.Rows.Select(r => r[0].ToLowerInvariant()).ToList().IndexOf(selection.UserName.ToLowerInvariant());
@@ -78,12 +80,12 @@ namespace Lunch.Services.Dishes
             destinationFromColumn = destinationFromColumn + rowNumber;
             destinationToColumn = destinationToColumn + rowNumber;
 
-            var stylesheetRequest = BuildSheetStyleRequest(selection, providers, sheets[0].SheetId,
+            var stylesheetRequest = BuildSheetStyleRequest(selection, providers, sheets[sheetIndex].SheetId,
                 rowNumber - 1, char.ToUpper(fromColumn[0]) - 64, addCurrencyFormatting);
 
             await _sheetsClient.UpdateSheetStyling(sheetId, stylesheetRequest);
 
-            await _sheetsClient.UpdateSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[0].Title, request).ConfigureAwait(false);
+            await _sheetsClient.UpdateSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[sheetIndex].Title, request).ConfigureAwait(false);
         }
 
         public async Task<SelectedDishesResponse> GetSelectedDishes(string dayOfWeek, string username)
@@ -108,7 +110,8 @@ namespace Lunch.Services.Dishes
             }
 
             var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
-            var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[0].Title)
+            int sheetIndex = day == DayOfWeek.Friday ? 0 : (int) day;
+            var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[sheetIndex].Title)
                 .ConfigureAwait(false);
 
             var rowNumber = response.Rows.Select(r => r[0].ToLowerInvariant()).ToList().IndexOf(username.ToLowerInvariant());
@@ -120,7 +123,7 @@ namespace Lunch.Services.Dishes
             destinationFromColumn = destinationFromColumn + rowNumber;
             destinationToColumn = destinationToColumn + rowNumber;
 
-            var clientResult = await _sheetsClient.GetSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[0].Title);
+            var clientResult = await _sheetsClient.GetSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[sheetIndex].Title);
 
             var result = new SelectedDishesResponse
             {

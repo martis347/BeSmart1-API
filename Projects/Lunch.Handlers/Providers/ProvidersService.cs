@@ -49,7 +49,7 @@ namespace Lunch.Services.Providers
                 {
                     throw new ApiException("Too few sheets on document. Please check that.", 403);
                 }
-                var sheetName = sheets[day == DayOfWeek.Friday ? 0 : (int)day].Title;
+                var sheetName = sheets[(int)day].Title;
                 var response = await _sheetsClient.GetSheetData(_providerConfig.FromColumn, _providerConfig.ToColumn, _googleConfig.SheetId, sheetName)
                     .ConfigureAwait(false);
 
