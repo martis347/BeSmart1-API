@@ -70,6 +70,8 @@ namespace Lunch.Host.Config
 
             app.UseMvc();
 
+            loggerFactory.AddFile("Logs/Lunch-{Date}.txt", LogLevel.Critical);
+
             /*app.UseCors(builder => builder
                 .AllowAnyHeader()
                 .AllowAnyOrigin()
