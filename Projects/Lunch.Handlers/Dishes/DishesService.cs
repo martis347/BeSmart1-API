@@ -61,7 +61,7 @@ namespace Lunch.Services.Dishes
             {
                 if (!String.IsNullOrEmpty(selection.Price) && selection.Price != "0")
                 {
-                    request[0].Add(selection.Price.Replace('.', ','));
+                    request[0].Add(selection.Price);
                 }
             }
 
