@@ -1,11 +1,12 @@
-﻿using Lunch.Domain.ErrorHandling;
+﻿using System;
+using Lunch.Domain.ErrorHandling;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Authentication;
 
 namespace Lunch.Host.Filters
 {
-    public class ExceptionFilter: IExceptionFilter
+    public class ExceptionFilter: Attribute, IExceptionFilter
     {
         public void OnException(ExceptionContext context)
         {

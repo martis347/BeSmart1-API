@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Lunch.Host.Controllers
 {
     [Route("api/[controller]")]
-    public class DishesController: Controller
+    public class DishesController: AuthenticatedController
     {
         private readonly IDishesService _dishesService;
         

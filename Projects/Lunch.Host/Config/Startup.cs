@@ -39,8 +39,6 @@ namespace Lunch.Host.Config
             // Add framework services.
             services.AddMvc(options =>
                 {
-                    options.Filters.Add(typeof(AuthorizationFilter));
-                    options.Filters.Add(typeof(ExceptionFilter));
                     options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigins"));
                 })
                 .AddJsonOptions(options =>
@@ -60,6 +58,7 @@ namespace Lunch.Host.Config
             services.AddTransient<IDishesService, DishesService>();
             
             services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<AuthorizationFilter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Lunch.Host.Controllers
 {
     [Route("api/[controller]/")]
-    public class ProvidersController: Controller
+    public class ProvidersController: AuthenticatedController
     {
         private readonly IProvidersService _providers;
         public ProvidersController(IProvidersService providers)

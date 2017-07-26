@@ -4,7 +4,7 @@ using Lunch.Authorization;
 
 namespace Lunch.Host.Filters
 {
-    public class AuthorizationFilter: IActionFilter
+    public class AuthorizationFilter: ActionFilterAttribute, IActionFilter
     {
         private readonly IAuthorizationService _authorizationService;
         
@@ -13,7 +13,7 @@ namespace Lunch.Host.Filters
             _authorizationService = authService;
         }
 
-        public void OnActionExecuting(ActionExecutingContext context)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
             var token = context.HttpContext.Request.Headers["access_token"];
 
