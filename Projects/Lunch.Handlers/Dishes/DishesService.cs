@@ -111,6 +111,16 @@ namespace Lunch.Services.Dishes
 
             var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
             int sheetIndex = day == DayOfWeek.Friday ? 0 : (int) day;
+
+            if(day == DayOfWeek.Friday)
+            {
+                var time = DateTime.Parse(sheets[sheetIndex].Title, System.Globalization.CultureInfo.InvariantCulture);
+                if (DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek).AddDays(5).DayOfYear != time.DayOfYear)
+                {
+                    throw new ApiException("There's no lunch for this friday yet.", 400);
+                }
+            }
+            
             var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[sheetIndex].Title)
                 .ConfigureAwait(false);
 

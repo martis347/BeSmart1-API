@@ -37,6 +37,11 @@ namespace Lunch.Services.Providers
             {
                 var sheets = await _sheetsClient.GetSheetsInfo(_googleConfig.FridaySheetId);
                 var sheetName = sheets[0].Title;
+                var time = DateTime.Parse(sheetName, System.Globalization.CultureInfo.InvariantCulture);
+                if(DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek).AddDays(5).DayOfYear != time.DayOfYear)
+                {
+                    throw new ApiException("There's no lunch for this friday yet.", 400);
+                }
                 var response = await _sheetsClient.GetSheetData(_providerConfig.FromColumnFriday, _providerConfig.ToColumnFriday, _googleConfig.FridaySheetId, sheetName)
                     .ConfigureAwait(false);
 
