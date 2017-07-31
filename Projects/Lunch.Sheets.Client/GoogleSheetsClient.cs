@@ -32,7 +32,7 @@ namespace Lunch.Sheets.Client
             var httpResult = await HttpClient.GetAsync(requestUrl).ConfigureAwait(false);
             if (!httpResult.IsSuccessStatusCode)
             {
-                throw new ApiException("Failed to retrieve data of providers.");
+                throw new ApiException("Failed to retrieve data of providers.", (int)httpResult.StatusCode);
             }
             var result = await MapSheetsResponse(httpResult.Content);
             return result;
@@ -43,7 +43,7 @@ namespace Lunch.Sheets.Client
             var httpResult = await HttpClient.GetAsync($"{sheetId}?fields=sheets.properties").ConfigureAwait(false);
             if (!httpResult.IsSuccessStatusCode)
             {
-                throw new ApiException("Failed to retrieve data of providers.");
+                throw new ApiException("Failed to retrieve data of providers.", (int) httpResult.StatusCode);
             }
 
             var result = await MapSheetsNamesResponse(httpResult.Content).ConfigureAwait(false);
@@ -67,7 +67,7 @@ namespace Lunch.Sheets.Client
             var httpResult = await HttpClient.PutAsync($"{sheetId}/values/{range}?valueInputOption=USER_ENTERED", content).ConfigureAwait(false);
             if (!httpResult.IsSuccessStatusCode)
             {
-                throw new ApiException($"Failed to update data in spreadsheet {sheetId}.");
+                throw new ApiException($"Failed to update data in spreadsheet {sheetId}.", (int)httpResult.StatusCode);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Lunch.Sheets.Client
             var httpResult = await HttpClient.PostAsync($"{sheetId}:batchUpdate", content).ConfigureAwait(false);
             if (!httpResult.IsSuccessStatusCode)
             {
-                throw new ApiException($"Failed to update styles in spreadsheet {sheetId}.");
+                throw new ApiException($"Failed to update styles in spreadsheet {sheetId}.", (int)httpResult.StatusCode);
             }
         }
 
