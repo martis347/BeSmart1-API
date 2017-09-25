@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Lunch.Domain;
 
 namespace Lunch.Services.Dishes
@@ -7,5 +8,6 @@ namespace Lunch.Services.Dishes
     {
         Task SelectDishes(UserSelection selection, string dayOfWeek);
         Task<SelectedDishesResponse> GetSelectedDishes(string dayOfWeek, string username);
+        Task<List<OrderCountResponse>> GetOrdersCount(string dayOfWeek);
     }
 }

@@ -36,7 +36,8 @@ namespace Lunch.Services.People
 
             var result = sheetsRespone.Rows
                 .Where(r => !String.IsNullOrEmpty(r.FirstOrDefault()))
-                .Select(r => new Person(r.FirstOrDefault())).ToList();
+                .Select(r => new Person(r.FirstOrDefault()))
+                .ToList();
             
             return result;
         }

@@ -43,7 +43,15 @@ namespace Lunch.Services.Dishes
                 destinationFromColumn = _dishesConfig.FromColumnLetter,
                 destinationToColumn = _dishesConfig.ToColumnLetter;
 
-            List<List<string>> request = new List<List<string>> {new List<string> { selection.SideDish != null ? selection.SideDish.Name : "", selection.MainDish != null ? selection.MainDish.Name : "" } };
+            List<List<string>> request = new List<List<string>>
+            {
+                new List<string>
+                {
+                    selection.SideDish != null ? selection.SideDish.Name : "",
+                    selection.MainDish != null ? selection.MainDish.Name : ""
+                }
+            };
+
             var providers = _providerConfig.Providers;
             bool addCurrencyFormatting = true;
             
@@ -121,10 +129,21 @@ namespace Lunch.Services.Dishes
                 }
             }
             
-            var response = await _sheetsClient.GetSheetData(fromColumn, toColumn, sheetId, sheets[sheetIndex].Title)
+            var response = await _sheetsClient
+                .GetSheetData(fromColumn, toColumn, sheetId, sheets[sheetIndex].Title)
                 .ConfigureAwait(false);
 
-            var rowNumber = response.Rows.Select(r => r[0].ToLowerInvariant()).ToList().IndexOf(username.ToLowerInvariant());
+            if (response == null)
+            {
+                throw new ApiException("Failed to retrieve sheet data", 400);
+            }
+
+            var rowNumber = response
+                .Rows
+                .Select(r => r[0].ToLowerInvariant())
+                .ToList()
+                .IndexOf(username.ToLowerInvariant());
+
             if (rowNumber++ == -1)
             {
                 throw new ApiException("User with given name not found in sheet", 400);
@@ -141,6 +160,49 @@ namespace Lunch.Services.Dishes
                 SideDish = clientResult.Rows[0][0].Length > 4 ? clientResult.Rows[0][0] : null,
                 Price = clientResult.Rows[0].Count > 2 && clientResult.Rows[0][2].Contains('€') ? clientResult.Rows[0][2] : null
             };
+
+            return result;
+        }
+
+        public async Task<List<OrderCountResponse>> GetOrdersCount(string dayOfWeek)
+        {
+            _sheetsClient.SetAuthorization(_authService.GetToken());
+
+            var day = ServicesHelper.GetDayOfWeek(dayOfWeek);
+
+            string sheetId = _googleConfig.SheetId,
+                destinationFromColumn = _dishesConfig.FromColumnLetter,
+                destinationToColumn = _dishesConfig.ToColumnLetter;
+
+            if (day == DayOfWeek.Friday)
+            {
+                sheetId = _googleConfig.FridaySheetId;
+                destinationFromColumn = _dishesConfig.FromColumnFridayLetter;
+                destinationToColumn = _dishesConfig.ToColumnFridayLetter;
+            }
+
+
+            var sheets = await _sheetsClient.GetSheetsInfo(sheetId).ConfigureAwait(false);
+            int sheetIndex = day == DayOfWeek.Friday ? 0 : (int)day;
+
+            var response = await _sheetsClient.GetSheetData(destinationFromColumn, destinationToColumn, sheetId, sheets[sheetIndex].Title)
+                .ConfigureAwait(false);
+
+            var result = response
+                .Rows
+                .Skip(1)
+                .Select(r => r.Take(2))
+                .SelectMany(r => r)
+                .Where(r => !String.IsNullOrEmpty(r))
+                .Select(d => d.Trim(' ', '+'))
+                .GroupBy(d => d)
+                .Select(dg => new OrderCountResponse
+                {
+                    DishName = dg.Key,
+                    Count = dg.Count()
+                })
+                .OrderByDescending(r => r.Count)
+                .ToList();
 
             return result;
         }

@@ -86,12 +86,9 @@ namespace Lunch.Sheets.Client
         {
             var builder = new StringBuilder(url);
 
-            if (config != null)
+            if (config?.MajorDimension == MajorDimension.Columns)
             {
-                if (config.MajorDimension == MajorDimension.Columns)
-                {
-                    builder.Append("?majorDimension=columns");
-                } 
+                builder.Append("?majorDimension=columns");
             }
 
             return builder.ToString();

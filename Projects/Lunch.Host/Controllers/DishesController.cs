@@ -29,5 +29,13 @@ namespace Lunch.Host.Controllers
 
             return result;
         }
+
+        [HttpGet("ordersCount/{dayOfWeek}")]
+        public async Task<List<OrderCountResponse>> GetOrdersCount(string dayOfWeek)
+        {
+            var result = await _dishesService.GetOrdersCount(dayOfWeek).ConfigureAwait(false);
+
+            return result;
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Lunch.Domain
+﻿namespace Lunch.Domain
 {
     public class SelectedDishesResponse
     {

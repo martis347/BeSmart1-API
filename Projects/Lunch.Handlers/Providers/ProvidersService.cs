@@ -69,7 +69,13 @@ namespace Lunch.Services.Providers
             List<Provider> providers = new List<Provider>();
             
             var providerList = new Provider();
-            List<string> categories = sheetsResponse.Rows.Select(c => c[0]).Where(c => c != "" && c[c.Length - 1] == ':').ToList();
+
+            List<string> categories = sheetsResponse
+                .Rows
+                .Select(rowValue => rowValue.FirstOrDefault())
+                .Where(rowValue => !String.IsNullOrEmpty(rowValue) && LastCharacterIsNotColon(rowValue))
+                .ToList();
+
             string currentCategory = "";
             bool firstProvider = true;
             foreach (var row in sheetsResponse.Rows)
@@ -98,6 +104,11 @@ namespace Lunch.Services.Providers
             providers.Add(providerList);
 
             return providers.Where(p => p.Dishes.Count > 0).ToList();
+        }
+
+        private bool LastCharacterIsNotColon(string value)
+        {
+            return value[value.Length - 1] == ':';
         }
 
         private List<Provider> MapFridayProviders(SheetsResponse sheetsResponse)
